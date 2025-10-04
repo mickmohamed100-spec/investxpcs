@@ -632,6 +632,34 @@
             vertical-align: middle;
         }
 
+        /* Tabs pour la section Tâches */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         /* Responsive */
         @media (min-width: 768px) {
             .plans-container {
@@ -856,7 +884,7 @@
     </section>
 
     <!-- Registration Modal -->
-    <div class="modal" id="registrationModal">
+    <div class="modal active" id="registrationModal">
         <div class="modal-content">
             <h2 class="modal-title"><i class="fas fa-user-plus"></i> Inscription</h2>
             <p>Créez votre compte pour commencer à investir</p>
@@ -874,11 +902,6 @@
             <div class="form-group">
                 <label class="form-label" for="phone">Numéro de Téléphone (WhatsApp)</label>
                 <input type="tel" class="form-input" id="phone" placeholder="Ex: +229 01 23 45 67">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Mot de Passe</label>
-                <input type="password" class="form-input" id="password" placeholder="Créez un mot de passe">
             </div>
 
             <div class="form-group">
@@ -1020,7 +1043,6 @@
             firstName: '',
             lastName: '',
             phone: '',
-            password: '',
             userId: '',
             balance: 0,
             currentPlan: null,
@@ -1080,7 +1102,6 @@
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
         const phoneInput = document.getElementById('phone');
-        const passwordInput = document.getElementById('password');
         
         const paymentModal = document.getElementById('paymentModal');
         const closePaymentModal = document.getElementById('closePaymentModal');
@@ -1137,15 +1158,6 @@
         });
 
         function initializeApp() {
-            // Vérifier s'il y a un paramètre de référence dans l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            
-            if (refParam) {
-                // Enregistrer la référence pour le parrainage
-                localStorage.setItem('referral_ref', refParam);
-            }
-            
             // Charger les données utilisateur depuis le localStorage si disponibles
             const savedData = localStorage.getItem('investxpcs_user');
             if (savedData) {
@@ -1153,15 +1165,10 @@
                 
                 // Si l'utilisateur est déjà inscrit, masquer la modale d'inscription
                 if (userData.isRegistered) {
+                    registrationModal.classList.remove('active');
                     updateReferralLink();
                     updateTasksMode();
-                } else {
-                    // Afficher la modale d'inscription si l'utilisateur n'est pas inscrit
-                    registrationModal.classList.add('active');
                 }
-            } else {
-                // Aucune donnée utilisateur trouvée, afficher la modale d'inscription
-                registrationModal.classList.add('active');
             }
             
             // Vérifier si c'est un nouveau jour pour réinitialiser les vidéos
@@ -1251,9 +1258,8 @@
             const firstName = firstNameInput.value.trim();
             const lastName = lastNameInput.value.trim();
             const phone = phoneInput.value.trim();
-            const password = passwordInput.value.trim();
             
-            if (!firstName || !lastName || !phone || !password) {
+            if (!firstName || !lastName || !phone) {
                 alert('Veuillez remplir tous les champs.');
                 return;
             }
@@ -1267,7 +1273,6 @@
             userData.firstName = firstName;
             userData.lastName = lastName;
             userData.phone = phone;
-            userData.password = password;
             userData.userId = userId;
             
             // Sauvegarder les données
@@ -1293,10 +1298,7 @@
 
         function updateReferralLink() {
             if (userData.userId) {
-                // Générer le lien de parrainage avec l'URL complète
-                const currentUrl = window.location.href.split('?')[0]; // URL sans paramètres
-                const referralUrl = `${currentUrl}?ref=${userData.userId}`;
-                referralInput.value = referralUrl;
+                referralInput.value = `https://investxpcs.com?ref=${userData.userId}`;
             }
         }
 
@@ -1633,4 +1635,4 @@
         }
     </script>
 </body>
-</html>
+                                           </html>
