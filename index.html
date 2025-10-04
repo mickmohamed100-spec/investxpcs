@@ -632,6 +632,11 @@
             vertical-align: middle;
         }
 
+        /* Indicateur VIP sur tableau de bord */
+        .vip-card {
+            border-left: 4px solid #ffd700;
+        }
+
         /* Tabs pour la section Tâches */
         .tabs {
             display: flex;
@@ -658,6 +663,26 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        /* Video Player Modal */
+        .video-player {
+            width: 100%;
+            height: 200px;
+            background-color: #000;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-direction: column;
+        }
+
+        .video-countdown {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         /* Responsive */
@@ -721,7 +746,7 @@
 
     <!-- Dashboard Section -->
     <section id="dashboard" class="section active">
-        <div class="card">
+        <div class="card" id="dashboardCard">
             <h2 class="card-title"><i class="fas fa-chart-line"></i> Tableau de Bord</h2>
             <p>Bienvenue sur votre plateforme d'investissement INVESTXPCS.</p>
             
@@ -779,7 +804,7 @@
                     <div class="ad-container">
                         <h3>Formation E-commerce Exclusive</h3>
                         <p>Apprenez à générer des revenus passifs avec nos stratégies éprouvées</p>
-                        <button class="btn btn-warning" style="margin-top: 10px;">
+                        <button class="btn btn-warning" id="accessFormationBtn" style="margin-top: 10px;">
                             <i class="fas fa-play"></i> Accéder à la Formation
                         </button>
                     </div>
@@ -905,6 +930,11 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label" for="password">Mot de Passe</label>
+                <input type="password" class="form-input" id="password" placeholder="Créez un mot de passe">
+            </div>
+
+            <div class="form-group">
                 <button class="btn btn-primary" id="registerBtn" style="width: 100%;">
                     <i class="fas fa-check"></i> S'inscrire
                 </button>
@@ -1023,6 +1053,26 @@
         </div>
     </div>
 
+    <!-- Video Player Modal -->
+    <div class="modal" id="videoPlayerModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeVideoPlayerModal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-play-circle"></i> Vidéo en Cours</h2>
+            
+            <div class="video-player">
+                <i class="fas fa-play-circle" style="font-size: 3rem;"></i>
+                <div class="video-countdown" id="videoCountdown">10</div>
+                <p>Veuillez regarder cette vidéo jusqu'à la fin</p>
+            </div>
+            
+            <div class="form-group">
+                <button class="btn btn-primary" id="openVideoBtn" style="width: 100%;">
+                    <i class="fab fa-youtube"></i> Ouvrir la Vidéo sur YouTube
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="footer-links">
@@ -1043,6 +1093,7 @@
             firstName: '',
             lastName: '',
             phone: '',
+            password: '',
             userId: '',
             balance: 0,
             currentPlan: null,
@@ -1074,6 +1125,15 @@
             { name: 'Luc Bernard', date: '2023-10-11' }
         ];
 
+        // Vidéos quotidiennes réelles
+        const dailyVideos = [
+            { url: "https://youtu.be/1Pml5DspwBQ" },
+            { url: "https://youtu.be/EdwAiHpN1Mg" },
+            { url: "https://youtu.be/seuTK2R4zzM" },
+            { url: "https://youtu.be/8riMFCXAu1A" },
+            { url: "https://youtu.be/xuP4g7IDgDM" }
+        ];
+
         // Éléments DOM
         const currentBalanceEl = document.getElementById('currentBalance');
         const headerUserIdEl = document.getElementById('headerUserId');
@@ -1102,6 +1162,7 @@
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
         const phoneInput = document.getElementById('phone');
+        const passwordInput = document.getElementById('password');
         
         const paymentModal = document.getElementById('paymentModal');
         const closePaymentModal = document.getElementById('closePaymentModal');
@@ -1136,7 +1197,12 @@
         const formationWatchVideoBtn = document.getElementById('formationWatchVideoBtn');
         const formationClaimGainBtn = document.getElementById('formationClaimGainBtn');
         
-        const gainHistory = document.getElementById('gainHistory');
+        const accessFormationBtn = document.getElementById('accessFormationBtn');
+        
+        const videoPlayerModal = document.getElementById('videoPlayerModal');
+        const closeVideoPlayerModal = document.getElementById('closeVideoPlayerModal');
+        const videoCountdown = document.getElementById('videoCountdown');
+        const openVideoBtn = document.getElementById('openVideoBtn');
         
         const referralInput = document.getElementById('referralInput');
         const copyReferralBtn = document.getElementById('copyReferralBtn');
@@ -1147,6 +1213,8 @@
 
         // Variables pour suivre l'état
         let selectedPlan = null;
+        let currentVideoIndex = 0;
+        let countdownInterval = null;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -1158,6 +1226,15 @@
         });
 
         function initializeApp() {
+            // Vérifier si l'utilisateur arrive via un lien de parrainage
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            
+            if (refParam) {
+                console.log(`Utilisateur arrivé via le lien de parrainage: ${refParam}`);
+                // Ici, vous pourriez enregistrer le parrainage si nécessaire
+            }
+            
             // Charger les données utilisateur depuis le localStorage si disponibles
             const savedData = localStorage.getItem('investxpcs_user');
             if (savedData) {
@@ -1168,6 +1245,7 @@
                     registrationModal.classList.remove('active');
                     updateReferralLink();
                     updateTasksMode();
+                    updateVIPIndicators();
                 }
             }
             
@@ -1219,6 +1297,9 @@
             closeWithdrawalModal.addEventListener('click', closeWithdrawalModalFunc);
             confirmWithdrawalBtn.addEventListener('click', processWithdrawal);
             
+            closeVideoPlayerModal.addEventListener('click', closeVideoPlayerModalFunc);
+            openVideoBtn.addEventListener('click', openCurrentVideo);
+            
             withdrawBtn.addEventListener('click', openWithdrawalModal);
             
             // Vidéos - Mode Standard
@@ -1228,6 +1309,9 @@
             // Vidéos - Mode Formation
             formationWatchVideoBtn.addEventListener('click', watchVideo);
             formationClaimGainBtn.addEventListener('click', claimDailyGain);
+            
+            // Formation
+            accessFormationBtn.addEventListener('click', accessFormation);
             
             // Autres
             copyReferralBtn.addEventListener('click', copyReferralLink);
@@ -1247,6 +1331,10 @@
                 if (e.target === withdrawalModal) {
                     closeWithdrawalModalFunc();
                 }
+                if (e.target === videoPlayerModal) {
+                    // Ne pas permettre de fermer la modale vidéo en cliquant à l'extérieur
+                    e.preventDefault();
+                }
                 if (e.target === registrationModal) {
                     // Ne pas permettre de fermer la modale d'inscription en cliquant à l'extérieur
                     e.preventDefault();
@@ -1258,8 +1346,9 @@
             const firstName = firstNameInput.value.trim();
             const lastName = lastNameInput.value.trim();
             const phone = phoneInput.value.trim();
+            const password = passwordInput.value.trim();
             
-            if (!firstName || !lastName || !phone) {
+            if (!firstName || !lastName || !phone || !password) {
                 alert('Veuillez remplir tous les champs.');
                 return;
             }
@@ -1273,6 +1362,7 @@
             userData.firstName = firstName;
             userData.lastName = lastName;
             userData.phone = phone;
+            userData.password = password;
             userData.userId = userId;
             
             // Sauvegarder les données
@@ -1282,6 +1372,7 @@
             updateUI();
             updateReferralLink();
             updateTasksMode();
+            updateVIPIndicators();
             
             // Fermer la modale d'inscription
             registrationModal.classList.remove('active');
@@ -1298,7 +1389,8 @@
 
         function updateReferralLink() {
             if (userData.userId) {
-                referralInput.value = `https://investxpcs.com?ref=${userData.userId}`;
+                const baseUrl = window.location.origin + window.location.pathname;
+                referralInput.value = `${baseUrl}?ref=${userData.userId}`;
             }
         }
 
@@ -1312,6 +1404,16 @@
                 // Mode Vidéos uniquement pour V1-V2
                 formationMode.style.display = 'none';
                 videosMode.style.display = 'block';
+            }
+        }
+
+        function updateVIPIndicators() {
+            // Mettre à jour l'indicateur VIP sur le tableau de bord
+            const dashboardCard = document.getElementById('dashboardCard');
+            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
+                dashboardCard.classList.add('vip-card');
+            } else {
+                dashboardCard.classList.remove('vip-card');
             }
         }
 
@@ -1465,6 +1567,15 @@
             withdrawalPhoneInput.value = '';
         }
 
+        function closeVideoPlayerModalFunc() {
+            // Arrêter le compte à rebours si actif
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            videoPlayerModal.classList.remove('active');
+        }
+
         function processPayment() {
             if (!selectedPlan) return;
             
@@ -1492,6 +1603,7 @@
                 // Mettre à jour l'UI
                 updateUI();
                 updateTasksMode();
+                updateVIPIndicators();
                 
                 // Fermer la modale
                 closePaymentModalFunc();
@@ -1544,26 +1656,52 @@
         }
 
         function watchVideo() {
-            if (userData.videosWatched < 5) {
-                userData.videosWatched++;
-                saveUserData();
-                updateVideoProgress();
+            if (userData.videosWatched >= 5) {
+                alert('Vous avez déjà regardé toutes les vidéos pour aujourd\'hui.');
+                return;
+            }
+            
+            // Sélectionner la vidéo actuelle
+            currentVideoIndex = userData.videosWatched;
+            if (currentVideoIndex >= dailyVideos.length) {
+                currentVideoIndex = 0; // Recommencer si on dépasse la liste
+            }
+            
+            // Ouvrir la modale vidéo
+            videoPlayerModal.classList.add('active');
+            
+            // Démarrer le compte à rebours
+            let countdown = 10;
+            videoCountdown.textContent = countdown;
+            
+            countdownInterval = setInterval(() => {
+                countdown--;
+                videoCountdown.textContent = countdown;
                 
-                // Simuler le visionnage d'une vidéo
-                const button = event.target.closest('button');
-                if (button) {
-                    button.disabled = true;
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Visionnage...';
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
                     
-                    setTimeout(() => {
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fas fa-play"></i> Regarder une Vidéo';
-                        
-                        if (userData.videosWatched === 5) {
-                            alert('Félicitations ! Vous avez regardé toutes les vidéos. Vous pouvez maintenant réclamer votre gain quotidien.');
-                        }
-                    }, 10000); // 10 secondes
+                    // Marquer la vidéo comme regardée
+                    userData.videosWatched++;
+                    saveUserData();
+                    updateVideoProgress();
+                    
+                    // Fermer la modale
+                    closeVideoPlayerModalFunc();
+                    
+                    alert('Vidéo terminée ! Vous pouvez passer à la suivante.');
+                    
+                    if (userData.videosWatched === 5) {
+                        alert('Félicitations ! Vous avez regardé toutes les vidéos. Vous pouvez maintenant réclamer votre gain quotidien.');
+                    }
                 }
+            }, 1000);
+        }
+
+        function openCurrentVideo() {
+            if (currentVideoIndex < dailyVideos.length) {
+                window.open(dailyVideos[currentVideoIndex].url, '_blank');
             }
         }
 
@@ -1575,6 +1713,14 @@
                 updateUI();
                 
                 alert(`Gain quotidien de ${formatCurrency(userData.dailyGain)} FCFA ajouté à votre solde !`);
+            }
+        }
+
+        function accessFormation() {
+            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
+                window.open('https://wa.me/2290190566942', '_blank');
+            } else {
+                alert('Cette fonctionnalité est réservée aux abonnés des plans V3 (Or) ou supérieurs.');
             }
         }
 
@@ -1635,4 +1781,4 @@
         }
     </script>
 </body>
-                                           </html>
+</html>
