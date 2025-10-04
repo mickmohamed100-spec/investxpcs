@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INVESTXPCS - Plateforme d'Investissement</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et Reset */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --gray-color: #64748b;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding-bottom: 80px; /* Pour laisser de l'espace à la navbar fixe */
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .user-id {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .balance {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .profile-icon {
+            background-color: white;
+            color: var(--primary-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            margin-left: 10px;
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray-color);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Cards */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        /* Plans */
+        .plans-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .plan-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .plan-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .plan-theme {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            margin-bottom: 5px;
+        }
+
+        .plan-investment {
+            font-size: 0.9rem;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .plan-gain {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        /* Style spécifique pour chaque plan */
+        .plan-card[data-plan="V1"] {
+            border-color: #a8a8a8;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+        }
+        
+        .plan-card[data-plan="V2"] {
+            border-color: #c0c0c0;
+            background: linear-gradient(135deg, #f8f8f8, #d8d8d8);
+        }
+        
+        .plan-card[data-plan="V3"] {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #fff9e6, #ffeb99);
+        }
+        
+        .plan-card[data-plan="V4"] {
+            border-color: #b9f2ff;
+            background: linear-gradient(135deg, #f0fdff, #d4f7ff);
+        }
+        
+        .plan-card[data-plan="V5"] {
+            border-color: #e5e4e2;
+            background: linear-gradient(135deg, #f8f8f8, #e8e8e8);
+        }
+        
+        .plan-card[data-plan="V6"] {
+            border-color: #0f52ba;
+            background: linear-gradient(135deg, #e6f0ff, #c2d9ff);
+        }
+        
+        .plan-card[data-plan="V7"] {
+            border-color: #50c878;
+            background: linear-gradient(135deg, #e8f8ef, #c8f0d9);
+        }
+        
+        .plan-card[data-plan="V8"] {
+            border-color: #e0115f;
+            background: linear-gradient(135deg, #ffe6ef, #ffc2d9);
+        }
+        
+        .plan-card[data-plan="V9"] {
+            border-color: #878681;
+            background: linear-gradient(135deg, #f0f0f0, #d8d8d8);
+        }
+
+        /* Badge VIP pour plans V3+ */
+        .vip-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #8b7500;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Videos */
+        .video-progress {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .video-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #34d399);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+            color: white;
+        }
+
+        .btn:disabled {
+            background-color: var(--gray-color);
+            cursor: not-allowed;
+        }
+
+        /* Formation & Trading */
+        .formation-section {
+            margin-bottom: 25px;
+        }
+
+        .ad-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            color: white;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chart-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--box-shadow);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .trading-tips {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .tips-list {
+            list-style-type: none;
+        }
+
+        .tips-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Contacts */
+        .contacts-list {
+            list-style: none;
+        }
+
+        .contact-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: white;
+        }
+
+        /* Profile */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-right: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 5px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: #f1f5f9;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+
+        /* Referral */
+        .referral-link {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .referral-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .referral-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            padding: 0 15px;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer-links {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Indicateur VIP sur profil */
+        .vip-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #8b7500;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .plans-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .profile-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .video-actions {
+                flex-direction: row;
+            }
+            
+            .footer-links {
+                flex-direction: row;
+                justify-content: center;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">INVESTXPCS</div>
+        <div class="user-info">
+            <div class="user-id" id="headerUserId">INV000</div>
+            <div class="balance" id="currentBalance">0 FCFA</div>
+        </div>
+        <div class="profile-icon" id="profileIcon">
+            <i class="fas fa-user"></i>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-section="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </a>
+        <a href="#" class="nav-item" data-section="tasks">
+            <i class="fas fa-tasks"></i>
+            <span>Tâches</span>
+        </a>
+        <a href="#" class="nav-item" data-section="plans">
+            <i class="fas fa-crown"></i>
+            <span>VIP</span>
+        </a>
+        <a href="#" class="nav-item" data-section="contacts">
+            <i class="fas fa-users"></i>
+            <span>Équipe</span>
+        </a>
+        <a href="#" class="nav-item" id="profileNav">
+            <i class="fas fa-user-circle"></i>
+            <span>Mon profil</span>
+        </a>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section active">
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-chart-line"></i> Tableau de Bord</h2>
+            <p>Bienvenue sur votre plateforme d'investissement INVESTXPCS.</p>
+            
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="dashboardBalance">0 FCFA</div>
+                    <div class="stat-label">Solde Actuel</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentPlan">Aucun</div>
+                    <div class="stat-label">Plan Actuel</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dailyGain">0 FCFA</div>
+                    <div class="stat-label">Gain Quotidien</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="referralCount">0</div>
+                    <div class="stat-label">Filleuls</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-share-alt"></i> Parrainage</h2>
+            <p>Invitez vos amis et gagnez 30 FCFA pour chaque inscription.</p>
+            <div class="referral-link">
+                <input type="text" class="referral-input" id="referralInput" value="" readonly>
+                <button class="referral-btn" id="copyReferralBtn">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <button class="btn btn-warning" id="simulateReferralBtn" style="width: 100%; margin-top: 10px;">
+                <i class="fas fa-user-plus"></i> Simuler un Clic sur mon Lien
+            </button>
+        </div>
+
+        <div class="card" id="v3Promotion">
+            <h2 class="card-title"><i class="fas fa-gem"></i> Passez au Niveau Supérieur</h2>
+            <p>Débloquez la formation exclusive et les fichiers CSV de mise à jour en passant au plan V3 (Or) ou supérieur.</p>
+            <button class="btn btn-primary" id="upgradeToV3Btn">
+                <i class="fas fa-arrow-up"></i> Voir les Plans VIP
+            </button>
+        </div>
+    </section>
+
+    <!-- Tasks Section -->
+    <section id="tasks" class="section">
+        <!-- Mode Formation & Trading (V3+) -->
+        <div id="formationMode" style="display: none;">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-graduation-cap"></i> Formation & Trading</h2>
+                
+                <div class="formation-section">
+                    <div class="ad-container">
+                        <h3>Formation E-commerce Exclusive</h3>
+                        <p>Apprenez à générer des revenus passifs avec nos stratégies éprouvées</p>
+                        <button class="btn btn-warning" style="margin-top: 10px;">
+                            <i class="fas fa-play"></i> Accéder à la Formation
+                        </button>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h4>Analyse de Marché</h4>
+                        <div class="chart-placeholder">
+                            Graphique Trading en Temps Réel
+                        </div>
+                    </div>
+                    
+                    <div class="trading-tips">
+                        <h4>Conseils du Jour</h4>
+                        <ul class="tips-list">
+                            <li>Diversifiez votre portefeuille d'investissement</li>
+                            <li>Analysez les tendances avant d'investir</li>
+                            <li>Fixez des objectifs de profit réalistes</li>
+                            <li>Utilisez des ordres stop-loss pour limiter les pertes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Vidéos dans l'onglet Formation -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-play-circle"></i> Tâches Vidéos Quotidiennes</h2>
+                <p>Regardez 5 vidéos de 10 secondes chaque jour pour réclamer votre gain quotidien.</p>
+                
+                <div class="video-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="formationVideoProgress"></div>
+                    </div>
+                    <div id="formationVideoStatus">0/5 vidéos regardées</div>
+                </div>
+
+                <div class="video-actions">
+                    <button class="btn btn-primary" id="formationWatchVideoBtn">
+                        <i class="fas fa-play"></i> Regarder une Vidéo
+                    </button>
+                    <button class="btn btn-success" id="formationClaimGainBtn" disabled>
+                        <i class="fas fa-gift"></i> Réclamer le Gain du Jour
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode Vidéos uniquement (V1-V2) -->
+        <div id="videosMode">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-play-circle"></i> Tâches Vidéos Quotidiennes</h2>
+                <p>Regardez 5 vidéos de 10 secondes chaque jour pour réclamer votre gain quotidien.</p>
+                
+                <div class="video-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="videoProgress"></div>
+                    </div>
+                    <div id="videoStatus">0/5 vidéos regardées</div>
+                </div>
+
+                <div class="video-actions">
+                    <button class="btn btn-primary" id="watchVideoBtn">
+                        <i class="fas fa-play"></i> Regarder une Vidéo
+                    </button>
+                    <button class="btn btn-success" id="claimGainBtn" disabled>
+                        <i class="fas fa-gift"></i> Réclamer le Gain du Jour
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Section -->
+    <section id="plans" class="section">
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-crown"></i> Plans d'Investissement</h2>
+            <p>Choisissez un plan d'investissement pour commencer à générer des revenus quotidiens.</p>
+            
+            <div class="plans-container" id="plansContainer">
+                <!-- Plans will be dynamically generated here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacts Section -->
+    <section id="contacts" class="section">
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-users"></i> Votre Équipe</h2>
+            <p>Les 5 derniers membres que vous avez parrainés.</p>
+            
+            <ul class="contacts-list" id="contactsList">
+                <!-- Contacts will be dynamically generated here -->
+            </ul>
+        </div>
+
+        <div class="card" id="csvCard" style="display: none;">
+            <h2 class="card-title"><i class="fas fa-file-csv"></i> Fichiers CSV</h2>
+            <p>Téléchargez le fichier CSV de mise à jour pour accéder à tous les contacts.</p>
+            <button class="btn btn-primary" id="downloadCsvBtn">
+                <i class="fas fa-download"></i> Télécharger le Fichier CSV
+            </button>
+        </div>
+    </section>
+
+    <!-- Registration Modal -->
+    <div class="modal" id="registrationModal">
+        <div class="modal-content">
+            <h2 class="modal-title"><i class="fas fa-user-plus"></i> Inscription</h2>
+            <p>Créez votre compte pour commencer à investir</p>
+            
+            <div class="form-group">
+                <label class="form-label" for="firstName">Prénom</label>
+                <input type="text" class="form-input" id="firstName" placeholder="Votre prénom">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="lastName">Nom</label>
+                <input type="text" class="form-input" id="lastName" placeholder="Votre nom">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="phone">Numéro de Téléphone (WhatsApp)</label>
+                <input type="tel" class="form-input" id="phone" placeholder="Ex: +229 01 23 45 67">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Mot de Passe</label>
+                <input type="password" class="form-input" id="password" placeholder="Créez un mot de passe">
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" id="registerBtn" style="width: 100%;">
+                    <i class="fas fa-check"></i> S'inscrire
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeProfileModal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-user"></i> Mon Profil</h2>
+            
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                    <input type="file" id="avatarUpload" accept="image/*">
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">Utilisateur</h2>
+                    <p id="profilePlan">Plan: Aucun</p>
+                    <p id="profileId">ID: INV000</p>
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="profileBalance">0 FCFA</div>
+                    <div class="stat-label">Solde</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="profileInvestment">0 FCFA</div>
+                    <div class="stat-label">Investissement</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="profileGain">0 FCFA</div>
+                    <div class="stat-label">Gain Quotidien</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="profileReferrals">0</div>
+                    <div class="stat-label">Filleuls</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" id="withdrawBtn" style="width: 100%;">
+                    <i class="fas fa-money-bill-wave"></i> Effectuer un Retrait
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closePaymentModal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-credit-card"></i> Paiement</h2>
+            
+            <div class="form-group">
+                <label class="form-label" id="paymentDescription">Plan V1 (Fer) - 2 300 FCFA</label>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="mobileNetwork">Réseau Mobile</label>
+                <select class="form-select" id="mobileNetwork">
+                    <option value="">Sélectionnez votre réseau</option>
+                    <option value="mtn">MTN MoMo</option>
+                    <option value="moov">Moov Money</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="paymentPhone">Numéro de Téléphone</label>
+                <input type="tel" class="form-input" id="paymentPhone" placeholder="Votre numéro pour le paiement">
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" id="confirmPaymentBtn" style="width: 100%;">
+                    <i class="fas fa-check"></i> Confirmer le Paiement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Modal -->
+    <div class="modal" id="withdrawalModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeWithdrawalModal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-money-bill-wave"></i> Effectuer un Retrait</h2>
+            
+            <div class="form-group">
+                <label class="form-label" for="withdrawalAmount">Montant à retirer (FCFA)</label>
+                <input type="number" class="form-input" id="withdrawalAmount" placeholder="Entrez le montant">
+                <small>Le montant minimum de retrait est de 5 000 FCFA</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="withdrawalNetwork">Réseau Mobile</label>
+                <select class="form-select" id="withdrawalNetwork">
+                    <option value="">Sélectionnez votre réseau</option>
+                    <option value="mtn">MTN MoMo</option>
+                    <option value="moov">Moov Money</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="withdrawalPhone">Numéro de Téléphone</label>
+                <input type="tel" class="form-input" id="withdrawalPhone" placeholder="Votre numéro pour recevoir les fonds">
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" id="confirmWithdrawalBtn" style="width: 100%;">
+                    <i class="fas fa-check"></i> Confirmer le Retrait
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="mailto:investxpcs@gmail.com" class="footer-link">
+                <i class="fas fa-envelope"></i> investxpcs@gmail.com
+            </a>
+            <a href="https://wa.me/2290190566942" class="footer-link" target="_blank">
+                <i class="fab fa-whatsapp"></i> +229 01 90 56 69 42
+            </a>
+        </div>
+        <p>&copy; 2023 INVESTXPCS. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Données de l'application
+        const userData = {
+            isRegistered: false,
+            firstName: '',
+            lastName: '',
+            phone: '',
+            password: '',
+            userId: '',
+            balance: 0,
+            currentPlan: null,
+            investment: 0,
+            dailyGain: 0,
+            referrals: 0,
+            videosWatched: 0,
+            gainClaimedToday: false,
+            lastClaimDate: null
+        };
+
+        const plans = [
+            { id: 'V1', name: 'V1', theme: 'Fer', investment: 2300, dailyGain: 160 },
+            { id: 'V2', name: 'V2', theme: 'Aluminium', investment: 7000, dailyGain: 340 },
+            { id: 'V3', name: 'V3', theme: 'Or', investment: 12000, dailyGain: 520 },
+            { id: 'V4', name: 'V4', theme: 'Diamant', investment: 25000, dailyGain: 970 },
+            { id: 'V5', name: 'V5', theme: 'Platine', investment: 57000, dailyGain: 1875 },
+            { id: 'V6', name: 'V6', theme: 'Saphir', investment: 105000, dailyGain: 3980 },
+            { id: 'V7', name: 'V7', theme: 'Émeraude', investment: 231000, dailyGain: 7300 },
+            { id: 'V8', name: 'V8', theme: 'Rubis', investment: 549000, dailyGain: 16700 },
+            { id: 'V9', name: 'V9', theme: 'Titanium', investment: 1050000, dailyGain: 35000 }
+        ];
+
+        const contacts = [
+            { name: 'Jean Dupont', date: '2023-10-15' },
+            { name: 'Marie Martin', date: '2023-10-14' },
+            { name: 'Pierre Durand', date: '2023-10-13' },
+            { name: 'Sophie Lambert', date: '2023-10-12' },
+            { name: 'Luc Bernard', date: '2023-10-11' }
+        ];
+
+        // Éléments DOM
+        const currentBalanceEl = document.getElementById('currentBalance');
+        const headerUserIdEl = document.getElementById('headerUserId');
+        const dashboardBalanceEl = document.getElementById('dashboardBalance');
+        const currentPlanEl = document.getElementById('currentPlan');
+        const dailyGainEl = document.getElementById('dailyGain');
+        const referralCountEl = document.getElementById('referralCount');
+        const profileBalanceEl = document.getElementById('profileBalance');
+        const profileInvestmentEl = document.getElementById('profileInvestment');
+        const profileGainEl = document.getElementById('profileGain');
+        const profileReferralsEl = document.getElementById('profileReferrals');
+        const profilePlanEl = document.getElementById('profilePlan');
+        const profileNameEl = document.getElementById('profileName');
+        const profileIdEl = document.getElementById('profileId');
+        
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        
+        const profileIcon = document.getElementById('profileIcon');
+        const profileNav = document.getElementById('profileNav');
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        
+        const registrationModal = document.getElementById('registrationModal');
+        const registerBtn = document.getElementById('registerBtn');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const phoneInput = document.getElementById('phone');
+        const passwordInput = document.getElementById('password');
+        
+        const paymentModal = document.getElementById('paymentModal');
+        const closePaymentModal = document.getElementById('closePaymentModal');
+        const paymentDescription = document.getElementById('paymentDescription');
+        const mobileNetworkSelect = document.getElementById('mobileNetwork');
+        const paymentPhoneInput = document.getElementById('paymentPhone');
+        const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+        
+        const withdrawalModal = document.getElementById('withdrawalModal');
+        const closeWithdrawalModal = document.getElementById('closeWithdrawalModal');
+        const withdrawalAmount = document.getElementById('withdrawalAmount');
+        const withdrawalNetworkSelect = document.getElementById('withdrawalNetwork');
+        const withdrawalPhoneInput = document.getElementById('withdrawalPhone');
+        const confirmWithdrawalBtn = document.getElementById('confirmWithdrawalBtn');
+        
+        const plansContainer = document.getElementById('plansContainer');
+        const contactsList = document.getElementById('contactsList');
+        const csvCard = document.getElementById('csvCard');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+        
+        // Éléments pour les deux modes de l'onglet Tâches
+        const formationMode = document.getElementById('formationMode');
+        const videosMode = document.getElementById('videosMode');
+        
+        const videoProgress = document.getElementById('videoProgress');
+        const videoStatus = document.getElementById('videoStatus');
+        const watchVideoBtn = document.getElementById('watchVideoBtn');
+        const claimGainBtn = document.getElementById('claimGainBtn');
+        
+        const formationVideoProgress = document.getElementById('formationVideoProgress');
+        const formationVideoStatus = document.getElementById('formationVideoStatus');
+        const formationWatchVideoBtn = document.getElementById('formationWatchVideoBtn');
+        const formationClaimGainBtn = document.getElementById('formationClaimGainBtn');
+        
+        const gainHistory = document.getElementById('gainHistory');
+        
+        const referralInput = document.getElementById('referralInput');
+        const copyReferralBtn = document.getElementById('copyReferralBtn');
+        const simulateReferralBtn = document.getElementById('simulateReferralBtn');
+        const upgradeToV3Btn = document.getElementById('upgradeToV3Btn');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const avatarUpload = document.getElementById('avatarUpload');
+
+        // Variables pour suivre l'état
+        let selectedPlan = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            renderPlans();
+            renderContacts();
+            updateUI();
+        });
+
+        function initializeApp() {
+            // Vérifier s'il y a un paramètre de référence dans l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            
+            if (refParam) {
+                // Enregistrer la référence pour le parrainage
+                localStorage.setItem('referral_ref', refParam);
+            }
+            
+            // Charger les données utilisateur depuis le localStorage si disponibles
+            const savedData = localStorage.getItem('investxpcs_user');
+            if (savedData) {
+                Object.assign(userData, JSON.parse(savedData));
+                
+                // Si l'utilisateur est déjà inscrit, masquer la modale d'inscription
+                if (userData.isRegistered) {
+                    updateReferralLink();
+                    updateTasksMode();
+                } else {
+                    // Afficher la modale d'inscription si l'utilisateur n'est pas inscrit
+                    registrationModal.classList.add('active');
+                }
+            } else {
+                // Aucune donnée utilisateur trouvée, afficher la modale d'inscription
+                registrationModal.classList.add('active');
+            }
+            
+            // Vérifier si c'est un nouveau jour pour réinitialiser les vidéos
+            const today = new Date().toDateString();
+            if (userData.lastClaimDate !== today) {
+                userData.videosWatched = 0;
+                userData.gainClaimedToday = false;
+                userData.lastClaimDate = today;
+                saveUserData();
+            }
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Si l'utilisateur n'est pas inscrit, ne pas permettre la navigation
+                    if (!userData.isRegistered) {
+                        alert("Veuillez d'abord vous inscrire pour accéder à cette section.");
+                        return;
+                    }
+                    
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Mettre à jour la navigation active
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Afficher la section correspondante
+                    sections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+
+            // Inscription
+            registerBtn.addEventListener('click', registerUser);
+            
+            // Modales
+            profileIcon.addEventListener('click', openProfileModal);
+            profileNav.addEventListener('click', openProfileModal);
+            closeProfileModal.addEventListener('click', closeProfileModalFunc);
+            
+            closePaymentModal.addEventListener('click', closePaymentModalFunc);
+            confirmPaymentBtn.addEventListener('click', processPayment);
+            
+            closeWithdrawalModal.addEventListener('click', closeWithdrawalModalFunc);
+            confirmWithdrawalBtn.addEventListener('click', processWithdrawal);
+            
+            withdrawBtn.addEventListener('click', openWithdrawalModal);
+            
+            // Vidéos - Mode Standard
+            watchVideoBtn.addEventListener('click', watchVideo);
+            claimGainBtn.addEventListener('click', claimDailyGain);
+            
+            // Vidéos - Mode Formation
+            formationWatchVideoBtn.addEventListener('click', watchVideo);
+            formationClaimGainBtn.addEventListener('click', claimDailyGain);
+            
+            // Autres
+            copyReferralBtn.addEventListener('click', copyReferralLink);
+            simulateReferralBtn.addEventListener('click', simulateReferral);
+            upgradeToV3Btn.addEventListener('click', goToPlans);
+            downloadCsvBtn.addEventListener('click', downloadCsv);
+            avatarUpload.addEventListener('change', handleAvatarUpload);
+            
+            // Fermer les modales en cliquant en dehors
+            window.addEventListener('click', function(e) {
+                if (e.target === profileModal) {
+                    closeProfileModalFunc();
+                }
+                if (e.target === paymentModal) {
+                    closePaymentModalFunc();
+                }
+                if (e.target === withdrawalModal) {
+                    closeWithdrawalModalFunc();
+                }
+                if (e.target === registrationModal) {
+                    // Ne pas permettre de fermer la modale d'inscription en cliquant à l'extérieur
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function registerUser() {
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!firstName || !lastName || !phone || !password) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+            
+            // Générer un ID utilisateur basé sur le numéro de téléphone
+            const phoneDigits = phone.replace(/\D/g, '');
+            const userId = 'INV' + phoneDigits.slice(-3);
+            
+            // Mettre à jour les données utilisateur
+            userData.isRegistered = true;
+            userData.firstName = firstName;
+            userData.lastName = lastName;
+            userData.phone = phone;
+            userData.password = password;
+            userData.userId = userId;
+            
+            // Sauvegarder les données
+            saveUserData();
+            
+            // Mettre à jour l'UI
+            updateUI();
+            updateReferralLink();
+            updateTasksMode();
+            
+            // Fermer la modale d'inscription
+            registrationModal.classList.remove('active');
+            
+            // Rediriger vers la section Plans
+            navItems.forEach(nav => nav.classList.remove('active'));
+            document.querySelector('[data-section="plans"]').classList.add('active');
+            
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('plans').classList.add('active');
+            
+            alert(`Inscription réussie ! Votre ID de compte est : ${userId}`);
+        }
+
+        function updateReferralLink() {
+            if (userData.userId) {
+                // Générer le lien de parrainage avec l'URL complète
+                const currentUrl = window.location.href.split('?')[0]; // URL sans paramètres
+                const referralUrl = `${currentUrl}?ref=${userData.userId}`;
+                referralInput.value = referralUrl;
+            }
+        }
+
+        function updateTasksMode() {
+            // Afficher le mode approprié selon le plan de l'utilisateur
+            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
+                // Mode Formation & Trading pour V3+
+                formationMode.style.display = 'block';
+                videosMode.style.display = 'none';
+            } else {
+                // Mode Vidéos uniquement pour V1-V2
+                formationMode.style.display = 'none';
+                videosMode.style.display = 'block';
+            }
+        }
+
+        function renderPlans() {
+            plansContainer.innerHTML = '';
+            
+            plans.forEach(plan => {
+                const planCard = document.createElement('div');
+                planCard.className = 'plan-card';
+                planCard.setAttribute('data-plan', plan.id);
+                
+                // Ajouter un badge VIP pour les plans V3+
+                const vipBadge = ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(plan.id) 
+                    ? '<div class="vip-badge">VIP</div>' 
+                    : '';
+                
+                planCard.innerHTML = `
+                    ${vipBadge}
+                    <div class="plan-name">${plan.name}</div>
+                    <div class="plan-theme">${plan.theme}</div>
+                    <div class="plan-investment">${formatCurrency(plan.investment)} FCFA</div>
+                    <div class="plan-gain">${formatCurrency(plan.dailyGain)} FCFA/jour</div>
+                `;
+                
+                planCard.addEventListener('click', () => openPaymentModal(plan));
+                plansContainer.appendChild(planCard);
+            });
+        }
+
+        function renderContacts() {
+            contactsList.innerHTML = '';
+            
+            contacts.forEach(contact => {
+                const contactItem = document.createElement('li');
+                contactItem.className = 'contact-item';
+                
+                const initials = contact.name.split(' ').map(n => n[0]).join('');
+                
+                contactItem.innerHTML = `
+                    <div class="contact-avatar">
+                        ${initials}
+                    </div>
+                    <div>
+                        <div>${contact.name}</div>
+                        <small>Inscrit le ${contact.date}</small>
+                    </div>
+                `;
+                
+                contactsList.appendChild(contactItem);
+            });
+        }
+
+        function updateUI() {
+            // Mettre à jour les soldes
+            currentBalanceEl.textContent = `${formatCurrency(userData.balance)} FCFA`;
+            headerUserIdEl.textContent = userData.userId;
+            dashboardBalanceEl.textContent = `${formatCurrency(userData.balance)} FCFA`;
+            profileBalanceEl.textContent = `${formatCurrency(userData.balance)} FCFA`;
+            
+            // Mettre à jour le plan
+            const planText = userData.currentPlan ? userData.currentPlan : 'Aucun';
+            currentPlanEl.textContent = planText;
+            
+            // Ajouter un indicateur VIP pour les plans V3+
+            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
+                profilePlanEl.innerHTML = `Plan: ${planText} <span class="vip-indicator">VIP</span>`;
+            } else {
+                profilePlanEl.textContent = `Plan: ${planText}`;
+            }
+            
+            // Mettre à jour l'investissement et les gains
+            profileInvestmentEl.textContent = `${formatCurrency(userData.investment)} FCFA`;
+            dailyGainEl.textContent = `${formatCurrency(userData.dailyGain)} FCFA`;
+            profileGainEl.textContent = `${formatCurrency(userData.dailyGain)} FCFA`;
+            
+            // Mettre à jour les référents
+            referralCountEl.textContent = userData.referrals;
+            profileReferralsEl.textContent = userData.referrals;
+            
+            // Mettre à jour le nom et l'ID
+            profileNameEl.textContent = `${userData.firstName} ${userData.lastName}`;
+            profileIdEl.textContent = `ID: ${userData.userId}`;
+            
+            // Mettre à jour la progression des vidéos
+            updateVideoProgress();
+            
+            // Afficher/masquer l'accès CSV selon le plan
+            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
+                csvCard.style.display = 'block';
+            } else {
+                csvCard.style.display = 'none';
+            }
+        }
+
+        function updateVideoProgress() {
+            const progress = (userData.videosWatched / 5) * 100;
+            
+            // Mettre à jour les deux barres de progression
+            if (videoProgress) videoProgress.style.width = `${progress}%`;
+            if (formationVideoProgress) formationVideoProgress.style.width = `${progress}%`;
+            
+            // Mettre à jour les deux statuts
+            if (videoStatus) videoStatus.textContent = `${userData.videosWatched}/5 vidéos regardées`;
+            if (formationVideoStatus) formationVideoStatus.textContent = `${userData.videosWatched}/5 vidéos regardées`;
+            
+            // Activer/désactiver les boutons de réclamation
+            const canClaim = userData.videosWatched >= 5 && !userData.gainClaimedToday;
+            if (claimGainBtn) claimGainBtn.disabled = !canClaim;
+            if (formationClaimGainBtn) formationClaimGainBtn.disabled = !canClaim;
+        }
+
+        function openProfileModal() {
+            if (!userData.isRegistered) {
+                alert("Veuillez d'abord vous inscrire pour accéder à votre profil.");
+                return;
+            }
+            profileModal.classList.add('active');
+        }
+
+        function closeProfileModalFunc() {
+            profileModal.classList.remove('active');
+        }
+
+        function openPaymentModal(plan) {
+            if (!userData.isRegistered) {
+                alert("Veuillez d'abord vous inscrire pour accéder aux plans d'investissement.");
+                return;
+            }
+            
+            selectedPlan = plan;
+            paymentDescription.textContent = `${plan.name} (${plan.theme}) - ${formatCurrency(plan.investment)} FCFA`;
+            paymentModal.classList.add('active');
+        }
+
+        function closePaymentModalFunc() {
+            paymentModal.classList.remove('active');
+            selectedPlan = null;
+            // Réinitialiser les champs
+            mobileNetworkSelect.value = '';
+            paymentPhoneInput.value = '';
+        }
+
+        function openWithdrawalModal() {
+            withdrawalModal.classList.add('active');
+        }
+
+        function closeWithdrawalModalFunc() {
+            withdrawalModal.classList.remove('active');
+            withdrawalAmount.value = '';
+            withdrawalNetworkSelect.value = '';
+            withdrawalPhoneInput.value = '';
+        }
+
+        function processPayment() {
+            if (!selectedPlan) return;
+            
+            const network = mobileNetworkSelect.value;
+            const phone = paymentPhoneInput.value.trim();
+            
+            if (!network || !phone) {
+                alert('Veuillez sélectionner un réseau mobile et entrer votre numéro de téléphone.');
+                return;
+            }
+            
+            // Simuler un délai de traitement
+            confirmPaymentBtn.disabled = true;
+            confirmPaymentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement en cours...';
+            
+            setTimeout(() => {
+                // Mettre à jour les données utilisateur
+                userData.currentPlan = selectedPlan.id;
+                userData.investment = selectedPlan.investment;
+                userData.dailyGain = selectedPlan.dailyGain;
+                
+                // Sauvegarder les données
+                saveUserData();
+                
+                // Mettre à jour l'UI
+                updateUI();
+                updateTasksMode();
+                
+                // Fermer la modale
+                closePaymentModalFunc();
+                
+                // Réinitialiser le bouton
+                confirmPaymentBtn.disabled = false;
+                confirmPaymentBtn.innerHTML = '<i class="fas fa-check"></i> Confirmer le Paiement';
+                
+                // Afficher une alerte de succès
+                alert(`Paiement réussi ! Votre plan ${selectedPlan.name} (${selectedPlan.theme}) a été activé.`);
+                
+                // Si c'est V3 ou supérieur, rediriger vers WhatsApp
+                if (['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(selectedPlan.id)) {
+                    alert('Vous avez maintenant accès à la formation exclusive ! Redirection vers WhatsApp...');
+                    window.open('https://wa.me/2290190566942', '_blank');
+                }
+            }, 2000);
+        }
+
+        function processWithdrawal() {
+            const amount = parseInt(withdrawalAmount.value);
+            const network = withdrawalNetworkSelect.value;
+            const phone = withdrawalPhoneInput.value.trim();
+            
+            if (!amount || amount < 5000) {
+                alert('Le montant minimum de retrait est de 5 000 FCFA.');
+                return;
+            }
+            
+            if (amount > userData.balance) {
+                alert('Le montant demandé dépasse votre solde disponible.');
+                return;
+            }
+            
+            if (!network || !phone) {
+                alert('Veuillez sélectionner un réseau mobile et entrer votre numéro de téléphone.');
+                return;
+            }
+            
+            // Simuler le traitement du retrait
+            userData.balance -= amount;
+            saveUserData();
+            updateUI();
+            
+            // Fermer la modale
+            closeWithdrawalModalFunc();
+            
+            // Afficher une confirmation
+            alert(`Votre demande de retrait de ${formatCurrency(amount)} FCFA a été envoyée. Les fonds seront transférés sur votre ${network === 'mtn' ? 'MTN MoMo' : 'Moov Money'} (${phone}) dans les 24 heures.`);
+        }
+
+        function watchVideo() {
+            if (userData.videosWatched < 5) {
+                userData.videosWatched++;
+                saveUserData();
+                updateVideoProgress();
+                
+                // Simuler le visionnage d'une vidéo
+                const button = event.target.closest('button');
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Visionnage...';
+                    
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-play"></i> Regarder une Vidéo';
+                        
+                        if (userData.videosWatched === 5) {
+                            alert('Félicitations ! Vous avez regardé toutes les vidéos. Vous pouvez maintenant réclamer votre gain quotidien.');
+                        }
+                    }, 10000); // 10 secondes
+                }
+            }
+        }
+
+        function claimDailyGain() {
+            if (userData.videosWatched >= 5 && !userData.gainClaimedToday) {
+                userData.balance += userData.dailyGain;
+                userData.gainClaimedToday = true;
+                saveUserData();
+                updateUI();
+                
+                alert(`Gain quotidien de ${formatCurrency(userData.dailyGain)} FCFA ajouté à votre solde !`);
+            }
+        }
+
+        function copyReferralLink() {
+            if (!userData.isRegistered) {
+                alert("Veuillez d'abord vous inscrire pour accéder à cette fonctionnalité.");
+                return;
+            }
+            
+            referralInput.select();
+            document.execCommand('copy');
+            alert('Lien de parrainage copié !');
+        }
+
+        function simulateReferral() {
+            if (!userData.isRegistered) {
+                alert("Veuillez d'abord vous inscrire pour accéder à cette fonctionnalité.");
+                return;
+            }
+            
+            // Simuler l'ajout d'un parrainage
+            userData.referrals++;
+            userData.balance += 30; // 30 FCFA par parrainage
+            saveUserData();
+            updateUI();
+            
+            alert('Bonus de parrainage de 30 FCFA ajouté à votre solde !');
+        }
+
+        function goToPlans() {
+            // Activer l'onglet Plans
+            navItems.forEach(nav => nav.classList.remove('active'));
+            document.querySelector('[data-section="plans"]').classList.add('active');
+            
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('plans').classList.add('active');
+        }
+
+        function downloadCsv() {
+            // Simuler le téléchargement d'un fichier CSV
+            alert('Téléchargement du fichier CSV de mise à jour en cours...');
+        }
+
+        function handleAvatarUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Simuler l'upload de l'avatar
+                alert('Photo de profil mise à jour avec succès !');
+            }
+        }
+
+        function saveUserData() {
+            localStorage.setItem('investxpcs_user', JSON.stringify(userData));
+        }
+
+        function formatCurrency(amount) {
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+    </script>
+</body>
+</html>
