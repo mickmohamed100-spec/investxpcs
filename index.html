@@ -502,6 +502,35 @@
             background-color: white;
         }
 
+        /* Video Player Modal */
+        .video-modal-content {
+            max-width: 95%;
+            width: 100%;
+            height: 80%;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 70%;
+            background-color: #000;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-countdown {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
         /* Profile */
         .profile-header {
             display: flex;
@@ -632,11 +661,6 @@
             vertical-align: middle;
         }
 
-        /* Indicateur VIP sur tableau de bord */
-        .vip-card {
-            border-left: 4px solid #ffd700;
-        }
-
         /* Tabs pour la section Tâches */
         .tabs {
             display: flex;
@@ -663,26 +687,6 @@
 
         .tab-content.active {
             display: block;
-        }
-
-        /* Video Player Modal */
-        .video-player {
-            width: 100%;
-            height: 200px;
-            background-color: #000;
-            border-radius: var(--border-radius);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-direction: column;
-        }
-
-        .video-countdown {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-top: 10px;
         }
 
         /* Responsive */
@@ -746,7 +750,7 @@
 
     <!-- Dashboard Section -->
     <section id="dashboard" class="section active">
-        <div class="card" id="dashboardCard">
+        <div class="card">
             <h2 class="card-title"><i class="fas fa-chart-line"></i> Tableau de Bord</h2>
             <p>Bienvenue sur votre plateforme d'investissement INVESTXPCS.</p>
             
@@ -804,7 +808,7 @@
                     <div class="ad-container">
                         <h3>Formation E-commerce Exclusive</h3>
                         <p>Apprenez à générer des revenus passifs avec nos stratégies éprouvées</p>
-                        <button class="btn btn-warning" id="accessFormationBtn" style="margin-top: 10px;">
+                        <button class="btn btn-warning" style="margin-top: 10px;">
                             <i class="fas fa-play"></i> Accéder à la Formation
                         </button>
                     </div>
@@ -1055,19 +1059,21 @@
 
     <!-- Video Player Modal -->
     <div class="modal" id="videoPlayerModal">
-        <div class="modal-content">
-            <span class="modal-close" id="closeVideoPlayerModal">&times;</span>
-            <h2 class="modal-title"><i class="fas fa-play-circle"></i> Vidéo en Cours</h2>
+        <div class="modal-content video-modal-content">
+            <span class="modal-close" id="closeVideoModal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-play-circle"></i> Vidéo</h2>
             
-            <div class="video-player">
-                <i class="fas fa-play-circle" style="font-size: 3rem;"></i>
-                <div class="video-countdown" id="videoCountdown">10</div>
-                <p>Veuillez regarder cette vidéo jusqu'à la fin</p>
+            <div class="video-container">
+                <iframe id="videoPlayer" class="video-player" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            
+            <div class="video-countdown" id="videoCountdown">
+                Temps restant: 10 secondes
             </div>
             
             <div class="form-group">
-                <button class="btn btn-primary" id="openVideoBtn" style="width: 100%;">
-                    <i class="fab fa-youtube"></i> Ouvrir la Vidéo sur YouTube
+                <button class="btn btn-success" id="markVideoWatchedBtn" style="width: 100%;" disabled>
+                    <i class="fas fa-check"></i> Marquer comme Terminé
                 </button>
             </div>
         </div>
@@ -1117,21 +1123,20 @@
             { id: 'V9', name: 'V9', theme: 'Titanium', investment: 1050000, dailyGain: 35000 }
         ];
 
-        const contacts = [
-            { name: 'Jean Dupont', date: '2023-10-15' },
-            { name: 'Marie Martin', date: '2023-10-14' },
-            { name: 'Pierre Durand', date: '2023-10-13' },
-            { name: 'Sophie Lambert', date: '2023-10-12' },
-            { name: 'Luc Bernard', date: '2023-10-11' }
-        ];
-
-        // Vidéos quotidiennes réelles
         const dailyVideos = [
             { url: "https://youtu.be/1Pml5DspwBQ" },
             { url: "https://youtu.be/EdwAiHpN1Mg" },
             { url: "https://youtu.be/seuTK2R4zzM" },
             { url: "https://youtu.be/8riMFCXAu1A" },
             { url: "https://youtu.be/xuP4g7IDgDM" }
+        ];
+
+        const contacts = [
+            { name: 'Jean Dupont', date: '2023-10-15' },
+            { name: 'Marie Martin', date: '2023-10-14' },
+            { name: 'Pierre Durand', date: '2023-10-13' },
+            { name: 'Sophie Lambert', date: '2023-10-12' },
+            { name: 'Luc Bernard', date: '2023-10-11' }
         ];
 
         // Éléments DOM
@@ -1178,6 +1183,12 @@
         const withdrawalPhoneInput = document.getElementById('withdrawalPhone');
         const confirmWithdrawalBtn = document.getElementById('confirmWithdrawalBtn');
         
+        const videoPlayerModal = document.getElementById('videoPlayerModal');
+        const closeVideoModal = document.getElementById('closeVideoModal');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoCountdown = document.getElementById('videoCountdown');
+        const markVideoWatchedBtn = document.getElementById('markVideoWatchedBtn');
+        
         const plansContainer = document.getElementById('plansContainer');
         const contactsList = document.getElementById('contactsList');
         const csvCard = document.getElementById('csvCard');
@@ -1197,12 +1208,7 @@
         const formationWatchVideoBtn = document.getElementById('formationWatchVideoBtn');
         const formationClaimGainBtn = document.getElementById('formationClaimGainBtn');
         
-        const accessFormationBtn = document.getElementById('accessFormationBtn');
-        
-        const videoPlayerModal = document.getElementById('videoPlayerModal');
-        const closeVideoPlayerModal = document.getElementById('closeVideoPlayerModal');
-        const videoCountdown = document.getElementById('videoCountdown');
-        const openVideoBtn = document.getElementById('openVideoBtn');
+        const gainHistory = document.getElementById('gainHistory');
         
         const referralInput = document.getElementById('referralInput');
         const copyReferralBtn = document.getElementById('copyReferralBtn');
@@ -1215,6 +1221,7 @@
         let selectedPlan = null;
         let currentVideoIndex = 0;
         let countdownInterval = null;
+        let countdownSeconds = 10;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -1226,15 +1233,6 @@
         });
 
         function initializeApp() {
-            // Vérifier si l'utilisateur arrive via un lien de parrainage
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            
-            if (refParam) {
-                console.log(`Utilisateur arrivé via le lien de parrainage: ${refParam}`);
-                // Ici, vous pourriez enregistrer le parrainage si nécessaire
-            }
-            
             // Charger les données utilisateur depuis le localStorage si disponibles
             const savedData = localStorage.getItem('investxpcs_user');
             if (savedData) {
@@ -1245,7 +1243,14 @@
                     registrationModal.classList.remove('active');
                     updateReferralLink();
                     updateTasksMode();
-                    updateVIPIndicators();
+                }
+            } else {
+                // Vérifier s'il y a un paramètre de référence dans l'URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const refParam = urlParams.get('ref');
+                if (refParam) {
+                    // Stocker la référence pour une utilisation ultérieure
+                    localStorage.setItem('referral_ref', refParam);
                 }
             }
             
@@ -1297,8 +1302,8 @@
             closeWithdrawalModal.addEventListener('click', closeWithdrawalModalFunc);
             confirmWithdrawalBtn.addEventListener('click', processWithdrawal);
             
-            closeVideoPlayerModal.addEventListener('click', closeVideoPlayerModalFunc);
-            openVideoBtn.addEventListener('click', openCurrentVideo);
+            closeVideoModal.addEventListener('click', closeVideoModalFunc);
+            markVideoWatchedBtn.addEventListener('click', markVideoAsWatched);
             
             withdrawBtn.addEventListener('click', openWithdrawalModal);
             
@@ -1309,9 +1314,6 @@
             // Vidéos - Mode Formation
             formationWatchVideoBtn.addEventListener('click', watchVideo);
             formationClaimGainBtn.addEventListener('click', claimDailyGain);
-            
-            // Formation
-            accessFormationBtn.addEventListener('click', accessFormation);
             
             // Autres
             copyReferralBtn.addEventListener('click', copyReferralLink);
@@ -1332,8 +1334,7 @@
                     closeWithdrawalModalFunc();
                 }
                 if (e.target === videoPlayerModal) {
-                    // Ne pas permettre de fermer la modale vidéo en cliquant à l'extérieur
-                    e.preventDefault();
+                    closeVideoModalFunc();
                 }
                 if (e.target === registrationModal) {
                     // Ne pas permettre de fermer la modale d'inscription en cliquant à l'extérieur
@@ -1372,7 +1373,6 @@
             updateUI();
             updateReferralLink();
             updateTasksMode();
-            updateVIPIndicators();
             
             // Fermer la modale d'inscription
             registrationModal.classList.remove('active');
@@ -1389,6 +1389,7 @@
 
         function updateReferralLink() {
             if (userData.userId) {
+                // Utiliser l'URL actuelle comme base pour le lien de parrainage
                 const baseUrl = window.location.origin + window.location.pathname;
                 referralInput.value = `${baseUrl}?ref=${userData.userId}`;
             }
@@ -1404,16 +1405,6 @@
                 // Mode Vidéos uniquement pour V1-V2
                 formationMode.style.display = 'none';
                 videosMode.style.display = 'block';
-            }
-        }
-
-        function updateVIPIndicators() {
-            // Mettre à jour l'indicateur VIP sur le tableau de bord
-            const dashboardCard = document.getElementById('dashboardCard');
-            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
-                dashboardCard.classList.add('vip-card');
-            } else {
-                dashboardCard.classList.remove('vip-card');
             }
         }
 
@@ -1567,13 +1558,15 @@
             withdrawalPhoneInput.value = '';
         }
 
-        function closeVideoPlayerModalFunc() {
-            // Arrêter le compte à rebours si actif
+        function closeVideoModalFunc() {
+            videoPlayerModal.classList.remove('active');
+            // Arrêter le compte à rebours
             if (countdownInterval) {
                 clearInterval(countdownInterval);
                 countdownInterval = null;
             }
-            videoPlayerModal.classList.remove('active');
+            // Réinitialiser le lecteur vidéo
+            videoPlayer.src = '';
         }
 
         function processPayment() {
@@ -1603,7 +1596,6 @@
                 // Mettre à jour l'UI
                 updateUI();
                 updateTasksMode();
-                updateVIPIndicators();
                 
                 // Fermer la modale
                 closePaymentModalFunc();
@@ -1661,47 +1653,62 @@
                 return;
             }
             
-            // Sélectionner la vidéo actuelle
+            // Obtenir la vidéo actuelle
             currentVideoIndex = userData.videosWatched;
-            if (currentVideoIndex >= dailyVideos.length) {
-                currentVideoIndex = 0; // Recommencer si on dépasse la liste
-            }
+            const videoUrl = dailyVideos[currentVideoIndex].url;
+            
+            // Convertir l'URL YouTube en URL d'intégration
+            const videoId = extractYouTubeId(videoUrl);
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+            
+            // Charger la vidéo dans le lecteur
+            videoPlayer.src = embedUrl;
+            
+            // Réinitialiser le compte à rebours
+            countdownSeconds = 10;
+            videoCountdown.textContent = `Temps restant: ${countdownSeconds} secondes`;
+            markVideoWatchedBtn.disabled = true;
             
             // Ouvrir la modale vidéo
             videoPlayerModal.classList.add('active');
             
-            // Démarrer le compte à rebours
-            let countdown = 10;
-            videoCountdown.textContent = countdown;
+            // Démarrer le compte à rebours lorsque la vidéo commence
+            videoPlayer.addEventListener('play', startCountdown);
+        }
+
+        function extractYouTubeId(url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length === 11) ? match[7] : null;
+        }
+
+        function startCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
             
             countdownInterval = setInterval(() => {
-                countdown--;
-                videoCountdown.textContent = countdown;
+                countdownSeconds--;
+                videoCountdown.textContent = `Temps restant: ${countdownSeconds} secondes`;
                 
-                if (countdown <= 0) {
+                if (countdownSeconds <= 0) {
                     clearInterval(countdownInterval);
-                    countdownInterval = null;
-                    
-                    // Marquer la vidéo comme regardée
-                    userData.videosWatched++;
-                    saveUserData();
-                    updateVideoProgress();
-                    
-                    // Fermer la modale
-                    closeVideoPlayerModalFunc();
-                    
-                    alert('Vidéo terminée ! Vous pouvez passer à la suivante.');
-                    
-                    if (userData.videosWatched === 5) {
-                        alert('Félicitations ! Vous avez regardé toutes les vidéos. Vous pouvez maintenant réclamer votre gain quotidien.');
-                    }
+                    markVideoWatchedBtn.disabled = false;
+                    videoCountdown.textContent = 'Vidéo terminée !';
                 }
             }, 1000);
         }
 
-        function openCurrentVideo() {
-            if (currentVideoIndex < dailyVideos.length) {
-                window.open(dailyVideos[currentVideoIndex].url, '_blank');
+        function markVideoAsWatched() {
+            userData.videosWatched++;
+            saveUserData();
+            updateVideoProgress();
+            
+            // Fermer la modale vidéo
+            closeVideoModalFunc();
+            
+            if (userData.videosWatched === 5) {
+                alert('Félicitations ! Vous avez regardé toutes les vidéos. Vous pouvez maintenant réclamer votre gain quotidien.');
             }
         }
 
@@ -1713,14 +1720,6 @@
                 updateUI();
                 
                 alert(`Gain quotidien de ${formatCurrency(userData.dailyGain)} FCFA ajouté à votre solde !`);
-            }
-        }
-
-        function accessFormation() {
-            if (userData.currentPlan && ['V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'].includes(userData.currentPlan)) {
-                window.open('https://wa.me/2290190566942', '_blank');
-            } else {
-                alert('Cette fonctionnalité est réservée aux abonnés des plans V3 (Or) ou supérieurs.');
             }
         }
 
